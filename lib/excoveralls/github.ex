@@ -23,7 +23,7 @@ defmodule ExCoveralls.Github do
       service_pull_request: job_data().pr,
       source_files: stats,
       service_job_id: job_data().job_id,
-      git: git_info(),
+      git: git_info()
     })
   end
   
