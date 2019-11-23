@@ -21,7 +21,7 @@ defmodule ExCoveralls.Github do
       repo_token: get_env("COVERALLS_REPO_TOKEN"),
       service_name: "github",
       service_pull_request: job_data().pr,
-      source_files: stats
+      source_files: stats,
       service_job_id: job_data().job_id,
       git: git_info(),
     })
