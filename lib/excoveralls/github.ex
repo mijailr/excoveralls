@@ -17,14 +17,14 @@ defmodule ExCoveralls.Github do
   def generate_json(stats, options \\ %{})
 
   def generate_json(stats, _options) do
-    Jason.encode!(%{
+    %{
       repo_token: get_env("COVERALLS_REPO_TOKEN"),
       service_name: "github",
-      service_pull_request: job_data().pr,
       source_files: stats,
-      service_job_id: job_data().job_id,
       git: git_info()
-    })
+    }
+    |> Map.merge(job_data())
+    |> Jason.encode!
   end
   
   defp get_env(env) do
@@ -36,25 +36,49 @@ defmodule ExCoveralls.Github do
     get_env("GITHUB_EVENT_NAME")
     |> case do
       "pull_request" ->
-        %{pr: get_pr_id(), job_id: "#{get_env("GITHUB_SHA")}-PR-#{get_pr_id()}"}
+        %{
+          service_pull_request: get_pr_id(),
+          service_job_id: "#{get_env("GITHUB_SHA")}-PR-#{get_pr_id()}"
+        }
       _ ->
-        %{pr: nil, job_id: get_env("GITHUB_SHA")}
+        %{service_job_id: get_env("GITHUB_SHA")}
     end
   end
 
   defp get_pr_id do
-    get_env("GITHUB_EVENT_PATH")
-    |> File.read!()
-    |> Jason.decode!()
+    event_info()
     |> Map.get("number")
     |> Integer.to_string
   end
+  
+  def get_committer_name() do
+    event_info()
+    |> Map.get("sender")
+    |> Map.get("login")
+  end
 
+  defp event_info do
+    get_env("GITHUB_EVENT_PATH")
+    |> File.read!()
+    |> Jason.decode!()
+  end
+
+  defp get_message do
+    {message, _} = System.cmd("git", ["log", "-1", "--pretty=format:%s"])
+    case message do
+      "" ->
+        "[no commit message]"
+      _ ->
+        message
+    end
+  end
 
   defp git_info do
     %{
       head: %{
         id: get_env("GITHUB_SHA"),
+        committer_name: get_committer_name(),
+        message: get_message()
       },
       branch: get_env("GITHUB_REF")
     }
