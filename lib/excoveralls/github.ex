@@ -20,12 +20,11 @@ defmodule ExCoveralls.Github do
     %{
       repo_token: get_env("GITHUB_TOKEN"),
       service_name: "github",
-      service_job_id: get_env("GITHUB_ACTION"),
-      service_pull_request: get_pull_request(),
       source_files: stats,
       parallel: options[:parallel],
       git: git_info()
     }
+    |> Map.merge(job_data())
     |> Jason.encode!
   end
   
@@ -34,13 +33,16 @@ defmodule ExCoveralls.Github do
     |> System.get_env
   end
 
-  defp get_pull_request() do
+  defp job_data() do
     get_env("GITHUB_EVENT_NAME")
     |> case do
       "pull_request" ->
-          get_pr_id()
+        %{
+          service_pull_request: get_pr_id(),
+          service_job_id: "#{get_env("GITHUB_SHA")}-PR-#{get_pr_id()}"
+        }
       _ ->
-        nil
+        %{service_job_id: get_env("GITHUB_SHA")}
     end
   end
 
@@ -63,7 +65,7 @@ defmodule ExCoveralls.Github do
   end
 
   defp get_message do
-    {message, _} = System.cmd("git", ["log", "-1", "--pretty=format:%s"])
+    {message, _} = System.cmd("git", ["log", get_env("GITHUB_SHA"), "-1", "--pretty=format:%s"])
     case message do
       "" ->
         "[no commit message]"
