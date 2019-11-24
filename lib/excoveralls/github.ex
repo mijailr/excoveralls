@@ -16,12 +16,12 @@ defmodule ExCoveralls.Github do
 
   def generate_json(stats, options \\ %{})
 
-  def generate_json(stats, _options) do
+  def generate_json(stats, options) do
     %{
       repo_token: get_env("GITHUB_TOKEN"),
-      service_job_id: get_env("GITHUB_ACTION"),
       service_name: "github",
       source_files: stats,
+      parallel: options[:parallel],
       git: git_info()
     }
     |> Map.merge(job_data())
@@ -37,9 +37,12 @@ defmodule ExCoveralls.Github do
     get_env("GITHUB_EVENT_NAME")
     |> case do
       "pull_request" ->
-        %{ service_pull_request: get_pr_id() }
+        %{
+          service_pull_request: get_pr_id(),
+          service_job_id: "#{get_env("GITHUB_SHA")}-PR-#{get_pr_id()}"
+        }
       _ ->
-        %{}
+        %{service_job_id: get_env("GITHUB_SHA")}
     end
   end
 
