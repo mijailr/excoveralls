@@ -85,7 +85,6 @@ defmodule ExCoveralls.Github do
   end
 
   defp get_branch do
-    "refs/heads/" <> branch = get_env("GITHUB_REF")
-    branch
+    get_env("GITHUB_REF")
   end
 end
