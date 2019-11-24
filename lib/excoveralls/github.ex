@@ -41,8 +41,10 @@ defmodule ExCoveralls.Github do
           service_pull_request: get_pr_id(),
           service_job_id: "PR-#{get_pr_id()}",
           git: %{
-            id: get_pr_sha(),
-            message: get_pr_message()
+            head: %{
+              id: get_pr_sha(),
+              message: get_pr_message()
+            }
           }
         }
       _ ->
