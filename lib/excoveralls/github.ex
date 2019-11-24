@@ -18,7 +18,7 @@ defmodule ExCoveralls.Github do
 
   def generate_json(stats, _options) do
     %{
-      repo_token: get_env("COVERALLS_REPO_TOKEN"),
+      repo_token: get_env("GITHUB_TOKEN"),
       service_name: "github",
       source_files: stats,
       git: git_info()
