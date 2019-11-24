@@ -75,14 +75,14 @@ defmodule ExCoveralls.Github do
   end
 
   defp git_info do
-    %{
-      head: %{
-        id: get_env("GITHUB_SHA"),
-        committer_name: get_committer_name(),
-        message: get_message()
-      },
-      branch: get_branch()
-    }
+    # %{
+      # head: %{
+      #   id: get_env("GITHUB_SHA"),
+      #   committer_name: get_committer_name(),
+      #   message: get_message()
+      # },
+      # branch: get_branch()
+    # }
   end
 
   defp get_branch do
