@@ -20,11 +20,12 @@ defmodule ExCoveralls.Github do
     %{
       repo_token: get_env("GITHUB_TOKEN"),
       service_name: "github",
+      service_job_id: get_env("GITHUB_ACTION"),
+      service_pull_request: get_pull_request(),
       source_files: stats,
       parallel: options[:parallel],
       git: git_info()
     }
-    |> Map.merge(job_data())
     |> Jason.encode!
   end
   
@@ -33,16 +34,13 @@ defmodule ExCoveralls.Github do
     |> System.get_env
   end
 
-  defp job_data() do
+  defp get_pull_request() do
     get_env("GITHUB_EVENT_NAME")
     |> case do
       "pull_request" ->
-        %{
-          service_pull_request: get_pr_id(),
-          service_job_id: "#{get_env("GITHUB_SHA")}-PR-#{get_pr_id()}"
-        }
+          get_pr_id()
       _ ->
-        %{service_job_id: get_env("GITHUB_SHA")}
+        nil
     end
   end
 
