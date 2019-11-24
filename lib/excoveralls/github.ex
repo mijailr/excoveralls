@@ -80,7 +80,12 @@ defmodule ExCoveralls.Github do
         committer_name: get_committer_name(),
         message: get_message()
       },
-      branch: get_env("GITHUB_REF")
+      branch: get_branch()
     }
+  end
+
+  defp get_branch do
+    "refs/heads/" <> branch = get_env("GITHUB_REF")
+    branch
   end
 end
