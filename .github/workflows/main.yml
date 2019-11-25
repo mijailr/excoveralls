@@ -7,6 +7,7 @@ env:
 on:
   push:
     branches:
+      - self-test
       - master
   pull_request:
 
