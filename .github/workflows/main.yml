@@ -47,4 +47,4 @@ jobs:
 
       - name: Run Tests
         run: |
-          mix coveralls.github
+          mix coveralls.github -v
